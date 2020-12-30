@@ -13,11 +13,10 @@ const ProductSchema = new mongoose.Schema(
           type:Number,
           required: [true, 'please add a price'],
          },
-      barcode: {
-         type:String,
-         unique: true,
-         required: [true, 'please attach a barcode'],
-      },
+       quantity:{
+          type:Number,
+          required: [true, 'please add a quantity'],
+         },
       description: {
         type: String,
         maxlength: [500, 'description cannot be more than 500 characters'],
@@ -26,6 +25,11 @@ const ProductSchema = new mongoose.Schema(
         type: String,
         default: 'no-image.jpg',
       },
+      barcode: {
+        type:String,
+        unique: true,
+        required: [true, 'please attach a barcode'],
+     },
       createdAt: {
         type: Date,
         default: Date.now,
