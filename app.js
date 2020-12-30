@@ -4,6 +4,7 @@ const express = require('express');
 const PORT = process.env.PORT || 4400;
 const colors = require('colors');
 const connectDb = require('./config/db');
+const cors = require('cors')
 
 //Routes files
 const products = require('./routes/products');
@@ -17,7 +18,9 @@ const fileupload = require('express-fileupload');
 dotenv.config({ path: './config/config.env' });
 //Connect to database
 connectDb();
+
 const app = express();
+app.use(cors())
 //body parser
 app.use(express.json());
 
