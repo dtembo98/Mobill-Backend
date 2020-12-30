@@ -30,7 +30,7 @@ app.use(fileupload());
 //set static folder for static files
 app.use(express.static(path.join(__dirname, 'public')));
 //Mount routers
-app.use('/api/v1',(req,res)=>
+app.get('/api/v1',(req,res)=>
 {
 res.status(200).json({message:"Server is healthy"})
 });
