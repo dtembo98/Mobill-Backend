@@ -36,7 +36,7 @@ app.use('/api/v1/products',products);
 app.use(errorHandler);
 const server = app.listen(PORT, () => {
   console.log(
-    `server running in ${process.env.NODE_ENV} mode on port ${PORT}`.blue.bold
+    `server running in ${process.env.NODE_ENV} mode on ports ${PORT}`.blue.bold
   );
 });
 //handle unhandled promise rejections
