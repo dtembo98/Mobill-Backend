@@ -30,6 +30,10 @@ const ProductSchema = new mongoose.Schema(
         unique: true,
         required: [true, 'please attach a barcode'],
      },
+     sold: {
+      type:Number,
+         
+   },
       createdAt: {
         type: Date,
         default: Date.now,
@@ -41,4 +45,9 @@ const ProductSchema = new mongoose.Schema(
     }
   );
 
+  ProductSchema.methods.buyProduct = function (quantity) {
+    console.log(this.quantity)
+    this.quantity = this.quantity - quantity;
+    console.log(this.quantity)
+  }
   module.exports = mongoose.model('Product', ProductSchema);
