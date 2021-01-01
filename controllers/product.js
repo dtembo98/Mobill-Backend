@@ -103,7 +103,7 @@ exports.salesStatus = asyncHandler(async(req,res,next) =>
 { 
   
   
-  const sale = await Sales.findOne(req.params)
+  const sale = await Sales.findById(req.params.saleId)
 
   if(!sale)
   {
