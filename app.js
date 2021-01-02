@@ -31,7 +31,7 @@ if (process.env.NODE_ENV === 'development') {
 //File uploading
 app.use(fileupload());
 //set static folder for static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public/uploads')));
 //Mount routers
 app.get('/api/v1',(req,res)=>
 {

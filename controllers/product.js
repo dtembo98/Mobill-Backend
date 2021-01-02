@@ -1,3 +1,4 @@
+const path = require('path')
 const axios = require('axios')
 const { v4 } = require('uuid');
 
@@ -8,19 +9,22 @@ const {endpoint_debit, endpoint_credit} = require('../config/config')
 
 const Product = require('../models/products')
 const Sales = require('../models/sales');
-const { findOne } = require('../models/products');
 
+//fetch all products from db
 exports.getProducts = asyncHandler(async (req,res,next) =>
 {
     const products =await Product.find()
     res.status(200).json({success:true,data:products})
 })
+
+//fetch sales data from db 
 exports.getSales = asyncHandler(async (req,res,next) =>
 {
     const sales =await Sales.find()
     res.status(200).json({success:true,data:sales})
 })
 
+// fetch single product
 exports.getProduct = asyncHandler(async (req,res,next) =>
 {
     const product =await Product.findById(req.params.id)
@@ -35,11 +39,66 @@ exports.getProduct = asyncHandler(async (req,res,next) =>
       }
     res.status(200).json({success:true,data:product})
 })
+
+//add product to db
 exports.addProduct = asyncHandler(async (req,res,next) =>
 {   
     
-    const products =await Product.create(req.body)
-    res.status(200).json({sucess:true,data:products})
+  if(!req.files)
+  {
+    return next(
+      new ErrorResponse("Please upload a product image",400)
+      )
+  }
+
+  const file = req.files.file
+  // make sure the image is a photo
+
+  if(!file.mimetype.startsWith('image'))
+  {
+    return next(
+      new ErrorResponse("Please upload an image",400)
+      )
+  }
+
+  //check file size
+
+  if(file.size > process.env.MAX_FILE_UPLOAD)
+  {
+    return next(
+      new ErrorResponse("Please upload an image less than 2mbs",400)
+      )
+  } 
+
+   //upload form fields to db
+
+    const product =await Product.create(req.body)
+    if(!product)
+    {
+      return next(
+        new ErrorResponse("Error creating product",500)
+        )
+    }
+   
+     //create custom file name
+     file.name = `product_${product.id}${path.parse(file.name).ext}`
+     
+     file.mv(`${process.env.PRODUCT_FILE_UPLOAD_PATH}/${file.name}`,async err =>
+     {
+       if(err)
+       {
+         console.log(err)
+         product.delete()
+         product.save()
+         return next(
+          new ErrorResponse("problem with file upload",500)
+          )
+       }
+       product.image = file.name
+       product.save()
+       res.status(200).json({message:"success",data:product})
+  
+     })
 })
 
 
@@ -93,7 +152,9 @@ exports.buyProduct = asyncHandler(async (req,res,next) =>
 
 exports.productImageUpload = asyncHandler(async(req,res,next) =>
 {
-   
+  
+    
+  
 })
 
 
