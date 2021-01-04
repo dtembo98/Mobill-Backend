@@ -32,14 +32,27 @@ exports.getProduct = asyncHandler(async (req,res,next) =>
     if (!product) {
         return next(
           new ErrorResponse(
-            `No product found with the id of ${req.params.bootcampId}`
+            `No product found with the id of ${req.params.id}`
           ),
           404
         );
       }
     res.status(200).json({success:true,data:product})
 })
+exports.getProductByCode = asyncHandler(async (req,res,next) =>
+{
+    const product =await Product.findOne(req.params)
 
+    if (!product) {
+        return next(
+          new ErrorResponse(
+            `No product found with the barcode of ${req.params.barcode}`
+          ),
+          404
+        );
+      }
+    res.status(200).json({success:true,data:product})
+})
 //add product to db
 exports.addProduct = asyncHandler(async (req,res,next) =>
 {   
