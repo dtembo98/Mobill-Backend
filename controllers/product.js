@@ -188,7 +188,7 @@ exports.salesStatus = asyncHandler(async(req,res,next) =>
   }
   if(sale.status === "processed")
   {
-    res.status(200).json({sucess:true,status:"proccesed"})
+    res.status(200).json({sucess:true,status:"processed"})
   } 
   else if(sale.status ==="failed") {
     res.status(200).json({sucess:true,status:"failed"})
