@@ -7,26 +7,28 @@ const asyncHandler = require('../middlewares/async')
 const {generatePayload} = require('../utils/helper')
 const {endpoint_debit, endpoint_credit} = require('../config/config')
 
+
 const Product = require('../models/products')
 const Sales = require('../models/sales');
 
 //fetch all products from db
 exports.getProducts = asyncHandler(async (req,res,next) =>
 {
-    const products =await Product.find()
+    const products =await Product.find({user:req.user.id})
     res.status(200).json({success:true,data:products})
 })
 
 //fetch sales data from db 
 exports.getSales = asyncHandler(async (req,res,next) =>
 {
-    const sales =await Sales.find()
+    const sales =await Sales.find({user:req.user.id})
     res.status(200).json({success:true,data:sales})
 })
 
 // fetch single product
 exports.getProduct = asyncHandler(async (req,res,next) =>
-{
+{   
+  req.params.user = req.user.id
     const product =await Product.findById(req.params.id)
 
     if (!product) {
@@ -41,6 +43,7 @@ exports.getProduct = asyncHandler(async (req,res,next) =>
 })
 exports.getProductByCode = asyncHandler(async (req,res,next) =>
 {
+    req.params.user = req.user.id
     const product =await Product.findOne(req.params)
 
     if (!product) {
@@ -84,7 +87,7 @@ exports.addProduct = asyncHandler(async (req,res,next) =>
   } 
 
    //upload form fields to db
-
+    req.body.user = req.user.id
     const product =await Product.create(req.body)
     if(!product)
     {
@@ -145,7 +148,8 @@ exports.buyProduct = asyncHandler(async (req,res,next) =>
      
 			return next(new ErrorResponse(`${results.data.message}`, 500));
     }
-     
+   
+    
     const saleEntry = {
       amount:totalAmount,
       buyer:mobile_wallet,
@@ -153,7 +157,9 @@ exports.buyProduct = asyncHandler(async (req,res,next) =>
       reference:reference,
       order:{
         product:product.id,
-        quantity}
+        quantity
+      },
+      user:req.user.id
     }
     const sales = await Sales.create(saleEntry)
     if(!sales)
@@ -177,7 +183,7 @@ exports.salesStatus = asyncHandler(async(req,res,next) =>
 { 
   
   
-  const sale = await Sales.findById(req.params.saleId)
+  const sale = await Sales.findOne({id:req.params.saleId,user:req.user.id})
 
   if(!sale)
   {
@@ -219,25 +225,32 @@ exports.productHook = asyncHandler(async(req,res,next) =>
   // if transaction is successful
   if(req.body.status ==='TXN_AUTH_SUCCESSFUL')
   {  
-    const salesUpdate = await Sales.updateOne({reference:req.body.merchantReference},{status:'processed'})
-    const sales = await Sales.findOne({reference:req.body.merchantReference})
-    if(salesUpdate)
-      {
-           // credit the shop owner    
-    const encoded_payload = generatePayload(sales.amount,'0963912233',v4());
-    //send payload
-  
-		const results = await axios.post(endpoint_credit, {
-			payload: encoded_payload,
-    });
-    if(results)
+
+    const sales = await Sales.findOne({reference:req.body.merchantReference}).populate({path:'user',select:'phone'})
+    if(sales)
     {
-      console.log(`money sent to shop owner`.green)
-    }     
-          console.log(`successful`.magenta)
-          console.log(salesUpdate)
-      }
-  }
+      const salesUpdate = await Sales.updateOne({reference:req.body.merchantReference,},{status:'processed'})
+
+      if(salesUpdate)
+        {
+             // credit the shop owner  
+       console.log(sales.user.phone)        
+      const encoded_payload = generatePayload(sales.amount,sales.user.phone,v4());
+      //send payload
+    
+      const results = await axios.post(endpoint_credit, {
+        payload: encoded_payload,
+      });
+      if(results)
+      {
+        console.log(`money sent to shop owner ${sales.user.phone}`.green)
+      }     
+            console.log(`successful`.magenta)
+            console.log(salesUpdate)
+        }
+    }
+    }
+   
 
 })
 

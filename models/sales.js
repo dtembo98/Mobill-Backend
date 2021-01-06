@@ -17,7 +17,12 @@ const SalesSchema = new mongoose.Schema(
             product:{type: mongoose.Schema.ObjectId,ref: 'Product',required: true,},
              quantity:{type:Number,required:true},},
 
-       reference:String,    
+       reference:String,  
+       user:{
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true}
+        ,  
         createdAt: {
             type: Date,
             default: Date.now,

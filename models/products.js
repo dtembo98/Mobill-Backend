@@ -30,10 +30,10 @@ const ProductSchema = new mongoose.Schema(
         unique: true,
         required: [true, 'please attach a barcode'],
      },
-     sold: {
-      type:Number,
-         
-   },
+     user:{
+       type: mongoose.Schema.ObjectId,
+       ref: 'User',
+       required: true,},
       createdAt: {
         type: Date,
         default: Date.now,

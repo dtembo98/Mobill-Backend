@@ -8,6 +8,8 @@ const cors = require('cors')
 
 //Routes files
 const products = require('./routes/products');
+const auth = require('./routes/auth')
+
 //const auth = require('./routes/auth');
 const morgan = require('morgan');
 const errorHandler = require('./middlewares/error');
@@ -33,11 +35,13 @@ app.use(fileupload());
 //set static folder for static files
 app.use(express.static(path.join(__dirname, 'public/uploads')));
 //Mount routers
-app.get('/api/v1',(req,res)=>
+app.get('/',(req,res)=>
 {
-res.status(200).json({message:"Server is healthy"})
+res.status(200).json({message:"Welcome! The server is health."})
 });
+app.use('/api/v1/auth',auth);
 app.use('/api/v1/products',products);
+
 //app.use('/api/v1/auth', auth);
 app.use(errorHandler);
 const server = app.listen(PORT, () => {

@@ -7,14 +7,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'please add a name'],
   },
-  email: {
+  phone: {
     type: String,
-    required: [true, 'please add an email'],
+    required: [true, 'please add a phone number'],
     unique: true,
-    match: [
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      'please add a valid email',
-    ],
+    
   },
   password: {
     type: String,
@@ -35,10 +32,11 @@ const UserSchema = new mongoose.Schema({
 UserSchema.pre('save', async function (next) {
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  console.log(this.password)
 });
 
 UserSchema.methods.getSignedJwtToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: this._id,name:this.name }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES,
   });
 };
