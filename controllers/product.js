@@ -123,7 +123,7 @@ exports.buyProduct = asyncHandler(async (req,res,next) =>
 {
 
     const { mobile_wallet,quantity} = req.body
- console.log(mobile_wallet)
+ 
     const product = await Product.findOne(req.params)
 
  
