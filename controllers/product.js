@@ -189,7 +189,7 @@ exports.salesStatus = asyncHandler(async(req,res,next) =>
   {
     return next(
       new ErrorResponse(
-        `No  Sale entry found with the id of ${req.body.saleId}`)
+        `No  Sale entry found with the id of ${req.params.saleId}`)
       )
   }
   if(sale.status === "processed")
