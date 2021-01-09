@@ -183,7 +183,7 @@ exports.salesStatus = asyncHandler(async(req,res,next) =>
 { 
   
   
-  const sale = await Sales.findOne({id:req.params.saleId,user:req.user.id})
+  const sale = await Sales.findOne({_id:req.params.saleId,user:req.user.id})
 
   if(!sale)
   {
