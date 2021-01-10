@@ -34,9 +34,6 @@ exports.getSales = asyncHandler(async (req,res,next) =>
 // fetch single product
 exports.getProduct = asyncHandler(async (req,res,next) =>
 {   
- 
-     
-     
     const product =await Product.findOne({_id:req.params.id,user:req.user.id})
     const sold = await Sales.countDocuments({product:req.params.id,user:req.user.id,status:'processed'})
     const totalAmountSold = sold * product.price
