@@ -50,4 +50,12 @@ const ProductSchema = new mongoose.Schema(
     this.quantity = this.quantity - quantity;
     console.log(this.quantity)
   }
+  
+  // ProductSchema.virtual('sold',{
+  //   ref:'Sales',
+  //   localField:'_id',
+  //   foreign:''
+  // })
+
+
   module.exports = mongoose.model('Product', ProductSchema);

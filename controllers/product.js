@@ -21,15 +21,25 @@ exports.getProducts = asyncHandler(async (req,res,next) =>
 //fetch sales data from db 
 exports.getSales = asyncHandler(async (req,res,next) =>
 {
-    const sales =await Sales.find({user:req.user.id})
-    res.status(200).json({success:true,data:sales})
+  let query
+  let queryStr = JSON.stringify(req.query)
+  console.log(queryStr)
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match =>`$${match}`)
+  query = Sales.find({user:req.user.id,...JSON.parse(queryStr)}).populate({path:'order',populate:{path:'product'}})
+
+  const sales =await query
+  res.status(200).json({success:true,data:sales})
 })
 
 // fetch single product
 exports.getProduct = asyncHandler(async (req,res,next) =>
 {   
-  req.params.user = req.user.id
-    const product =await Product.findById(req.params.id)
+ 
+     
+     
+    const product =await Product.findOne({_id:req.params.id,user:req.user.id})
+    const sold = await Sales.countDocuments({product:req.params.id,user:req.user.id,status:'processed'})
+    const totalAmountSold = sold * product.price
 
     if (!product) {
         return next(
@@ -39,7 +49,13 @@ exports.getProduct = asyncHandler(async (req,res,next) =>
           404
         );
       }
-    res.status(200).json({success:true,data:product})
+      const productDetails = 
+      {
+         product,
+        totalAmountSold,
+        sold
+      }
+    res.status(200).json({success:true,data:productDetails})
 })
 exports.getProductByCode = asyncHandler(async (req,res,next) =>
 {
@@ -155,10 +171,7 @@ exports.buyProduct = asyncHandler(async (req,res,next) =>
       buyer:mobile_wallet,
       status:'pending',
       reference:reference,
-      order:{
-        product:product.id,
-        quantity
-      },
+       product:product.id,
       user:req.user.id
     }
     const sales = await Sales.create(saleEntry)

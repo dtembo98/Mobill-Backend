@@ -13,11 +13,8 @@ const SalesSchema = new mongoose.Schema(
        status:{
             type:String,
            },
-       order:{
-            product:{type: mongoose.Schema.ObjectId,ref: 'Product',required: true,},
-             quantity:{type:Number,required:true},},
-
-       reference:String,  
+       product:{type: mongoose.Schema.ObjectId,ref: 'Product',required: true,},
+      reference:String,  
        user:{
         type: mongoose.Schema.ObjectId,
         ref: 'User',
@@ -33,6 +30,6 @@ const SalesSchema = new mongoose.Schema(
       toObject: { virtuals: true },
     }
   );
-
+ 
   
   module.exports = mongoose.model('Sales', SalesSchema);
