@@ -25,7 +25,7 @@ exports.getSales = asyncHandler(async (req,res,next) =>
   let queryStr = JSON.stringify(req.query)
   console.log(queryStr)
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match =>`$${match}`)
-  query = Sales.find({user:req.user.id,...JSON.parse(queryStr)}).populate({path:'order',populate:{path:'product'}})
+  query = Sales.find({user:req.user.id,...JSON.parse(queryStr)}).populate({path:'product'})
 
   const sales =await query
   res.status(200).json({success:true,data:sales})
