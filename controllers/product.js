@@ -18,15 +18,20 @@ exports.getProducts = asyncHandler(async (req,res,next) =>
     const products =await Product.find({user:req.user.id})
     res.status(200).json({success:true,data:products})
 })
+exports.getSales = asyncHandler(async (req,res,next) =>
+{
+    const sales =await Sales.find({user:req.user.id})
+    res.status(200).json({success:true,data:sales})
+})
 
 //fetch sales data from db 
-exports.getSales = asyncHandler(async (req,res,next) =>
+exports.getSold = asyncHandler(async (req,res,next) =>
 {
   let query
   let queryStr = JSON.stringify(req.query)
   
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match =>`$${match}`)
-  query = await Sales.find({user:req.user.id}).distinct('product',{status:'pending'})
+  query = await Sales.find({user:req.user.id}).distinct('product',{status:'processed'})
   
   const sales = await Product.find({_id:{$in:query}})
 
