@@ -10,6 +10,7 @@ const {endpoint_debit, endpoint_credit} = require('../config/config')
 
 const Product = require('../models/products')
 const Sales = require('../models/sales');
+const { find } = require('../models/products');
 
 //fetch all products from db
 exports.getProducts = asyncHandler(async (req,res,next) =>
@@ -23,11 +24,13 @@ exports.getSales = asyncHandler(async (req,res,next) =>
 {
   let query
   let queryStr = JSON.stringify(req.query)
-  console.log(queryStr)
+  
   queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in)\b/g, match =>`$${match}`)
-  query = Sales.find({user:req.user.id,...JSON.parse(queryStr)}).populate({path:'product'})
+  query = await Sales.find({user:req.user.id}).distinct('product',{status:'pending'})
+  
+  const sales = await Product.find({_id:{$in:query}})
 
-  const sales =await query
+  // const sales =await query
   res.status(200).json({success:true,data:sales})
 })
 
